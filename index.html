@@ -6,27 +6,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ajax Demo</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
   </head>
   <body>
-    <input type="text" id="txtId" />
-    <input type="button" value="OK" id="btnOk" /><br /><br />
-    <input type="text" id="txtOutput" />
+    <select id="dropDownState"></select>
+    <select id="dropDownDistrict"></select>
+    <select id="dropDownHospital"></select>
   </body>
 </html>
 
-
 <script>
   $(document).ready(function () {
-    $("#btnOk").click(function () {
+    var selectElem = $("#dropDownState");
+
+    bindStateDropDwon();
+    function bindStateDropDwon() {
       $.ajax({
         url: "https://cdn-api.co-vin.in/api/v2/admin/location/states",
         success: function (responce) {
-          $("#txtOutput").val(responce.states[$("#txtId").val()].state_name);
+          $.each(responce.states, function (index, value) {
+            $("<option/>", {
+              value: value.state_id,
+              text: value.state_name,
+            }).appendTo($("#dropDownState"));
+          });
         },
         error: function (responce) {
           alert("Error !");
         },
       });
+    }
+
+    function bindDistrictsDropDwon(stateId) {
+      $("#dropDownDistrict").empty();
+      $.ajax({
+        url:
+          "https://cdn-api.co-vin.in/api/v2/admin/location/districts/" +
+          stateId,
+        success: function (responce) {
+          $.each(responce.districts, function (index, value) {
+            console.log(value.state_id);
+            $("<option/>", {
+              value: value.district_id,
+              text: value.district_name,
+            }).appendTo($("#dropDownDistrict"));
+          });
+        },
+        error: function (responce) {
+          alert("Error !");
+        },
+      });
+    }
+
+    function bindHospitalDropDwon(districtId) {
+      var d = new Date();
+      var today =
+        d.getDate() + "-" + (d.getMonth() + 1) + "-" + +d.getFullYear();
+      console.log(districtId);
+      $("#dropDownHospital").empty();
+      $.ajax({
+        url:
+          "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id=" +
+          districtId +
+          "&date=" +
+          today,
+        success: function (responce) {
+          $.each(responce.sessions, function (index, value) {
+            console.log(value.state_id);
+            $("<option/>", {
+              value: value.center_id,
+              text: value.name,
+            }).appendTo($("#dropDownHospital"));
+          });
+        },
+        error: function (responce) {
+          alert("Error !");
+        },
+      });
+    }
+
+    $("#dropDownState").change(function () {
+      bindDistrictsDropDwon($("#dropDownState").val());
+    });
+    $("#dropDownDistrict").change(function () {
+      bindHospitalDropDwon($("#dropDownDistrict").val());
     });
   });
 </script>
+
+<!-- <input type="text" id="txtId" />
+    <input type="button" value="OK" id="btnOk" /><br /><br />
+    <input type="text" id="txtOutput" /> -->
+
+<!-- <div class="dropdown">
+      <button
+        class="btn btn-primary dropdown-toggle"
+        type="button"
+        data-toggle="dropdown"
+      >
+        States <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" id="">
+        <li><a href="#">HTML</a></li>
+        <li><a href="#">CSS</a></li>
+        <li><a href="#">JavaScript</a></li>
+      </ul>
+    </div> -->
