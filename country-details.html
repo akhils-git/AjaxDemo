@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-group">
+        <label for="text">Calling Code</label>
+        <input type="text" class="form-control" id="txtCallingCode" />
+      </div>
+      <div class="form-group">
+        <label for="pwd">Password:</label>
+        <input type="password" class="form-control" id="pwd" />
+      </div>
+     
+      <input type="button" id="btnOk" value="OK"  class=""/> <br />
+
+      <object data="" width="50" height="50" id="imgFlag"></object>
+    </div>
+  </body>
+</html>
+
+<script>
+  $(document).ready(function () {
+    $("#btnOk").click(function () {
+      $.ajax({
+        url: "https://restcountries.eu/rest/v2/callingcode/91",
+        success: function (responce) {
+          console.log(responce);
+          console.log(responce[0].flag);
+
+          $("#imgFlag").attr("data", responce[0].flag);
+          $("#imgFlag").attr({ width: 300, height: 300 });
+          $("#btnOk").attr({ value: "Done" });
+        },
+        error: function (responce) {
+          alert("Error !");
+        },
+      });
+    });
+  });
+</script>
